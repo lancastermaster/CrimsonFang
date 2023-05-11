@@ -13,5 +13,17 @@ UCLASS()
 class CRIMSONFANG_API UMainGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
+	public:
+	protected:
+	private:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = true))
+	float PlayerMaxHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = true))
+	float PlayerDamage;
+
+	public:
+
+	FORCEINLINE float GetPlayerMaxHealth() {return PlayerMaxHealth;}
 };

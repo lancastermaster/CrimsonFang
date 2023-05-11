@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "EnemyAnimInstance.generated.h"
+#include "PlayerAnimInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CRIMSONFANG_API UEnemyAnimInstance : public UAnimInstance
+class CRIMSONFANG_API UPlayerAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	
@@ -28,7 +28,5 @@ class CRIMSONFANG_API UEnemyAnimInstance : public UAnimInstance
 	bool bInAir;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	class ABaseEnemy* Enemy;
-
-	public:
+	class ACrimsonFangCharacter* Player;
 };

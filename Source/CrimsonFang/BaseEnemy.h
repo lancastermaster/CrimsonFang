@@ -39,6 +39,21 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDeath();
 
+	void FinishDeath();
+
+	void PlayHitMontage(FName Section, float PlayRate = 1.0f);
+
+	UFUNCTION(BlueprintCallable)
+	void PlayAttackMontage(FName Section, float PlayRate = 1.0f);
+
+	void DestroyEnemy();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetHitReact();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetCanAttack();
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = true))
 	FEnemyInfo EnemyStats;
@@ -58,19 +73,24 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	float DeathTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	float StunChance;
+
 	FTimerHandle DeathTimer;
 
 	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = true))
 	class UBehaviorTree* BehaviorTree;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-	class USphereComponent* CombatSphere;
+	class AEnemyController* EnemyBrain;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-	UAnimMontage* DeathMontage;
+	class UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-	UAnimMontage* RangedAttackMontage;
+	UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	UAnimMontage* HitMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	TArray<FName> AttackMontageSections;
@@ -78,8 +98,5 @@ private:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
