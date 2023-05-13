@@ -98,10 +98,10 @@ private:
 	TArray<FName> AttackMontageSections;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-	class UParticleSystemComponent* BloodParticles;
+	class UParticleSystem* BloodParticles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
-	UParticleSystemComponent* DeathParticles;
+	UParticleSystem* DeathParticles;
 
 public:	
 	// Called every frame

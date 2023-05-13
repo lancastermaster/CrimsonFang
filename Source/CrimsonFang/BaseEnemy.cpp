@@ -7,7 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnemyController.h"
-#include "Particles/ParticleSystemComponent.h"
+#include "Particles/ParticleSystem.h"
 
 // Sets default values
 ABaseEnemy::ABaseEnemy() :
@@ -44,6 +44,21 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent
 {
 	if(bDying)return DamageAmount;
 
+	if(BloodParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(
+			this->GetWorld(),
+			BloodParticles,
+			GetMesh()->GetSocketLocation(TEXT("Spine2")),
+			FRotator(0.f),
+			FVector(1.f),
+			true
+		);
+	}
+	/*
+		spawn blood particles attached to the enemies torso (setup socket)
+	*/
+
 	if(Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
@@ -54,13 +69,13 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent
 		Health -= DamageAmount;
 	}
 
-	//const float Stunned = FMath::RandRange(0.f,1.f);
-	/*if(Stunned >= StunChance)
+	const float Stunned = FMath::RandRange(0.f,1.f);
+	if(Stunned >= StunChance)
 	{
 		//stun enemy
 		if(HitMontage)PlayHitMontage(FName("React"));
 		//SetStunned(true);
-	}*/
+	}
 
     return 0.0f;
 }
@@ -93,7 +108,6 @@ void ABaseEnemy::PlayHitMontage(FName Section, float PlayRate)
 		//Reset via AnimNotify in Montage
 		bCanHitReact = false;
 		bCanAttack = false;
-		
 	}
 }
 
