@@ -26,4 +26,5 @@ class CRIMSONFANG_API UMainGameInstance : public UGameInstance
 	public:
 
 	FORCEINLINE float GetPlayerMaxHealth() {return PlayerMaxHealth;}
+	FORCEINLINE float GetPlayerDamage(){return PlayerDamage;}
 };

@@ -2,10 +2,13 @@
 
 #include "CrimsonFangCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "IDamageableInterface.h"
 #include "MainGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -33,6 +36,14 @@ ACrimsonFangCharacter::ACrimsonFangCharacter()
 	SideViewCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	SideViewCameraComponent->bUsePawnControlRotation = false; // We don't want the controller rotating the camera
 
+	// Create and attach the character's sword
+	SwordMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SwordMesh"));
+	SwordMesh->SetupAttachment(GetMesh(), TEXT("RightHandSocket"));
+
+	SwordCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordCollision"));
+	SwordCollision ->SetupAttachment(SwordMesh);
+
+
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f); // ...at this rotation rate
@@ -58,6 +69,12 @@ void ACrimsonFangCharacter::BeginPlay()
 	CurrentGameInstance = Cast<UMainGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	Health = CurrentGameInstance->GetPlayerMaxHealth();
+
+	SwordCollision->OnComponentBeginOverlap.AddDynamic(this, &ACrimsonFangCharacter::OnWeaponOverlap);
+	SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SwordCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	SwordCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	SwordCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
 void ACrimsonFangCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -91,7 +108,7 @@ void ACrimsonFangCharacter::MoveRight(float Value)
 
 void ACrimsonFangCharacter::Attack()
 {
-	PlayAttackMontage("Slash");
+	if(bCanAttack)PlayAttackMontage("Slash");
 }
 
 void ACrimsonFangCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -133,6 +150,25 @@ float ACrimsonFangCharacter::TakeDamage(float DamageAmount, FDamageEvent const &
 
 void ACrimsonFangCharacter::OnDeath()
 {
+
+}
+
+void ACrimsonFangCharacter::OnWeaponOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bSweep, const FHitResult &SweepResult)
+{
+	if(OtherActor)
+	{
+		IIDamageableInterface* DamageableInterface = Cast<IIDamageableInterface>(OtherActor);
+		if(DamageableInterface)
+		{
+			UGameplayStatics::ApplyDamage(
+				OtherActor,
+				CurrentGameInstance->GetPlayerDamage(),
+				this->GetController(),
+				this,
+				UDamageType::StaticClass()
+			);
+		}
+	}
 }
 
 void ACrimsonFangCharacter::FinishDeath()
@@ -185,5 +221,5 @@ void ACrimsonFangCharacter::ResetHitReact()
 
 void ACrimsonFangCharacter::ResetCanAttack()
 {
-	bCanHitReact = true;
+	bCanAttack = true;
 }

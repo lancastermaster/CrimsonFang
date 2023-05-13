@@ -3,9 +3,11 @@
 
 #include "BaseEnemy.h"
 #include "Animation/AnimMontage.h"
+#include "Components/CapsuleComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnemyController.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 ABaseEnemy::ABaseEnemy() :
@@ -40,6 +42,8 @@ void ABaseEnemy::Tick(float DeltaTime)
 
 float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
+	if(bDying)return DamageAmount;
+
 	if(Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
@@ -50,15 +54,13 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent
 		Health -= DamageAmount;
 	}
 
-	if(bDying)return DamageAmount;
-
-	const float Stunned = FMath::RandRange(0.f,1.f);
-	if(Stunned >= StunChance)
+	//const float Stunned = FMath::RandRange(0.f,1.f);
+	/*if(Stunned >= StunChance)
 	{
 		//stun enemy
-		PlayHitMontage(FName("React"));
+		if(HitMontage)PlayHitMontage(FName("React"));
 		//SetStunned(true);
-	}
+	}*/
 
     return 0.0f;
 }
@@ -66,6 +68,8 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent
 void ABaseEnemy::FinishDeath()
 {
 	GetMesh()->bPauseAnims = true;
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	GetWorldTimerManager().SetTimer(
 		DeathTimer,
@@ -130,5 +134,13 @@ void ABaseEnemy::ResetCanAttack()
 
 void ABaseEnemy::OnDeath_Implementation()
 {
-	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		if(AnimInstance)
+		{
+			AnimInstance->Montage_Play(DeathMontage, 1.f);
+			AnimInstance->Montage_JumpToSection(TEXT("Death"), HitMontage);
+
+			bDying = true;
+		}
 }

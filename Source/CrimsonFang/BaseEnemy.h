@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "IDamageableInterface.h"
 #include "BaseEnemy.generated.h"
 
 USTRUCT(BlueprintType)
@@ -22,7 +23,7 @@ struct FEnemyInfo
 };
 
 UCLASS()
-class CRIMSONFANG_API ABaseEnemy : public ACharacter
+class CRIMSONFANG_API ABaseEnemy : public ACharacter, public IIDamageableInterface
 {
 	GENERATED_BODY()
 
@@ -39,6 +40,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDeath();
 
+	UFUNCTION(BlueprintCallable)
 	void FinishDeath();
 
 	void PlayHitMontage(FName Section, float PlayRate = 1.0f);
@@ -94,6 +96,12 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	TArray<FName> AttackMontageSections;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	class UParticleSystemComponent* BloodParticles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	UParticleSystemComponent* DeathParticles;
 
 public:	
 	// Called every frame

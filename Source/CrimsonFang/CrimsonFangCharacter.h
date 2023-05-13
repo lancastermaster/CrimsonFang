@@ -19,6 +19,12 @@ class ACrimsonFangCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USkeletalMeshComponent* SwordMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UBoxComponent* SwordCollision;
+
 protected:
 	//virtual void PostInitializeComponents() override;
 
@@ -43,6 +49,16 @@ protected:
 
 	void OnDeath();
 
+	UFUNCTION()
+		void OnWeaponOverlap(
+			UPrimitiveComponent* OverlappedComponent, 
+			AActor* OtherActor, 
+			UPrimitiveComponent* OtherComp, 
+			int32 OtherBodyIndex, 
+			bool bSweep, 
+			const FHitResult& SweepResult
+		);
+
 	UFUNCTION(BlueprintCallable)
 	void FinishDeath();
 
@@ -63,7 +79,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	class UAnimMontage* DeathMontage;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	UAnimMontage* AttackMontage;
 
