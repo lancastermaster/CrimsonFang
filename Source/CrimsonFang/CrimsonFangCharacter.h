@@ -59,6 +59,9 @@ protected:
 			const FHitResult& SweepResult
 		);
 
+	UFUNCTION(BlueprintNativeEvent)
+	void PlayMeleeHitSound(USoundBase* HitSound);
+
 	UFUNCTION(BlueprintCallable)
 	void FinishDeath();
 
@@ -108,6 +111,15 @@ protected:
 	float StunChance;
 
 	FTimerHandle DeathTimer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	class USoundBase* MeleeHitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	class UParticleSystem* BloodParticles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	class UParticleSystem* SwordTrail;
 
 public:
 	ACrimsonFangCharacter();

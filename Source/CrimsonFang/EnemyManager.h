@@ -19,11 +19,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void GetLevelEnemies();
+	void GetAllLevelEnemies();
+
+	UFUNCTION(BlueprintCallable)
+	void ReactivateAllDeadEnemies();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	TArray<class ABaseEnemy*> LevelEnemies;
+	TMap<int, class ABaseEnemy*> LevelEnemies;
 
 public:	
 	// Called every frame

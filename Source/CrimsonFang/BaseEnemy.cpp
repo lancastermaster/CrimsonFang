@@ -15,6 +15,7 @@ ABaseEnemy::ABaseEnemy() :
 	bCanAttack(true),
 	bCanHitReact(true),
 	bDying(false),
+	bIsActive(true),
 	DeathTime(4.f),
 	StunChance(.5f)
 
@@ -31,6 +32,7 @@ void ABaseEnemy::BeginPlay()
 	
 	Health = EnemyStats.MaxHealth;
 	EnemyBrain = Cast<AEnemyController>(GetController());
+	StartLocation = GetActorLocation();
 }
 
 // Called every frame
@@ -38,6 +40,7 @@ void ABaseEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if(Health <=0 && bDying == false) bDying = true;
 }
 
 float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
@@ -62,20 +65,21 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent
 	if(Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
+		bDying = true;
 		OnDeath_Implementation();
 	}
 	else
 	{
 		Health -= DamageAmount;
+		const float Stunned = FMath::RandRange(0.f,1.f);
+		if(Stunned >= StunChance)
+		{
+			//stun enemy
+			if(HitMontage)PlayHitMontage(FName("React"));
+			//SetStunned(true);
+		}
 	}
 
-	const float Stunned = FMath::RandRange(0.f,1.f);
-	if(Stunned >= StunChance)
-	{
-		//stun enemy
-		if(HitMontage)PlayHitMontage(FName("React"));
-		//SetStunned(true);
-	}
 
     return 0.0f;
 }
@@ -86,10 +90,12 @@ void ABaseEnemy::FinishDeath()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	//Deactivate the enemy's brain/behavior tree.
+
 	GetWorldTimerManager().SetTimer(
 		DeathTimer,
 		this, 
-		&ABaseEnemy::DestroyEnemy, 
+		&ABaseEnemy::DeactivateEnemy, 
 		DeathTime);
 }
 
@@ -136,6 +142,22 @@ void ABaseEnemy::DestroyEnemy()
 	Destroy();
 }
 
+void ABaseEnemy::DeactivateEnemy()
+{
+	SetActorHiddenInGame(true);
+	SetActorLocation(StartLocation);
+	bIsActive = false;
+}
+
+void ABaseEnemy::ReactivateEnemy()
+{
+	Health = EnemyStats.MaxHealth;
+	bDying = false;
+	GetMesh()->bPauseAnims = false;
+	SetActorHiddenInGame(false);
+	bIsActive = true;
+}
+
 void ABaseEnemy::ResetHitReact()
 {
 	bCanHitReact = true;
@@ -154,7 +176,5 @@ void ABaseEnemy::OnDeath_Implementation()
 		{
 			AnimInstance->Montage_Play(DeathMontage, 1.f);
 			AnimInstance->Montage_JumpToSection(TEXT("Death"), HitMontage);
-
-			bDying = true;
 		}
 }

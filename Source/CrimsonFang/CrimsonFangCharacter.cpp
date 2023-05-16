@@ -11,6 +11,7 @@
 #include "IDamageableInterface.h"
 #include "MainGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 
 ACrimsonFangCharacter::ACrimsonFangCharacter()
 {
@@ -133,17 +134,17 @@ float ACrimsonFangCharacter::TakeDamage(float DamageAmount, FDamageEvent const &
 	else
 	{
 		Health -= DamageAmount;
+		const float Stunned = FMath::RandRange(.1f,1.f);
+		if(Stunned >= StunChance)
+		{
+			//stun enemy
+			PlayHitMontage(FName("React"));
+			//SetStunned(true);
+		}
 	}
 
 	if(bDying)return DamageAmount;
 
-	const float Stunned = FMath::RandRange(0.f,1.f);
-	if(Stunned >= StunChance)
-	{
-		//stun enemy
-		PlayHitMontage(FName("React"));
-		//SetStunned(true);
-	}
 
     return 0.0f;
 }
@@ -167,8 +168,17 @@ void ACrimsonFangCharacter::OnWeaponOverlap(UPrimitiveComponent *OverlappedCompo
 				this,
 				UDamageType::StaticClass()
 			);
+
+			if(MeleeHitSound)
+			{
+				PlayMeleeHitSound(MeleeHitSound);
+			}
 		}
 	}
+}
+
+void ACrimsonFangCharacter::PlayMeleeHitSound_Implementation(USoundBase* HitSound)
+{
 }
 
 void ACrimsonFangCharacter::FinishDeath()

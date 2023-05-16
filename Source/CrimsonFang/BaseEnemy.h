@@ -50,6 +50,9 @@ protected:
 
 	void DestroyEnemy();
 
+	void DeactivateEnemy();
+
+
 	UFUNCTION(BlueprintCallable)
 	void ResetHitReact();
 
@@ -73,10 +76,19 @@ private:
 	bool bDying;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	bool bIsActive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	float DeathTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	float StunChance;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Manager", meta = (AllowPrivateAccess = true))
+	int ManagerIndex;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Navigation", meta = (AllowPrivateAccess = true))
+	FVector StartLocation;
 
 	FTimerHandle DeathTimer;
 
@@ -107,4 +119,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void ReactivateEnemy();
+
+	FORCEINLINE bool GetIsActive() {return bIsActive;}
+	FORCEINLINE int GetManagerIndex() {return ManagerIndex;}
+	FORCEINLINE void SetManagerIndex(float NewIndex) {ManagerIndex = NewIndex;}
 };
