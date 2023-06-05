@@ -85,7 +85,7 @@ void ACrimsonFangCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &ACrimsonFangCharacter::Attack);
-	//PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &ACrimsonFangCharacter::Dodge);
+	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &ACrimsonFangCharacter::Dodge);
 	//PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACrimsonFangCharacter::Interact);
 	//PlayerInputComponent->BindAction("Spell", IE_Pressed, this, &ACrimsonFangCharacter::Spell);
 
@@ -112,6 +112,11 @@ void ACrimsonFangCharacter::Attack()
 	if(bCanAttack)PlayAttackMontage("Slash");
 }
 
+void ACrimsonFangCharacter::Dodge()
+{
+	LaunchCharacter(GetActorForwardVector() * 2000.f, true, true);
+}
+
 void ACrimsonFangCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
 	// jump on any touch
@@ -126,10 +131,12 @@ void ACrimsonFangCharacter::TouchStopped(const ETouchIndex::Type FingerIndex, co
 
 float ACrimsonFangCharacter::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
 {
+	if(bInvulnerable)return 0.0f;
+
     if(Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
-		//OnDeath();
+		OnDeath();
 	}
 	else
 	{
@@ -151,7 +158,26 @@ float ACrimsonFangCharacter::TakeDamage(float DamageAmount, FDamageEvent const &
 
 void ACrimsonFangCharacter::OnDeath()
 {
+	bDying = true;
 
+	this->GetMovementComponent()->StopMovementImmediately();
+
+	APlayerController* PC = Cast<APlayerController>(UGameplayStatics::GetPlayerController(this,0));
+	if (PC)
+	{
+		PC->SetInputMode(FInputModeUIOnly());
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(DeathMontage, 1.f);
+		AnimInstance->Montage_JumpToSection(TEXT("Death"), HitMontage);
+	}
+
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ACrimsonFangCharacter::OnWeaponOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bSweep, const FHitResult &SweepResult)
@@ -183,6 +209,8 @@ void ACrimsonFangCharacter::PlayMeleeHitSound_Implementation(USoundBase* HitSoun
 
 void ACrimsonFangCharacter::FinishDeath()
 {
+	GetMesh()->bPauseAnims = true;
+
 }
 
 void ACrimsonFangCharacter::PlayHitMontage(FName Section, float PlayRate)
@@ -203,7 +231,7 @@ void ACrimsonFangCharacter::PlayHitMontage(FName Section, float PlayRate)
 		//Reset via AnimNotify in Montage
 		bCanHitReact = false;
 		bCanAttack = false;
-		
+		bInvulnerable = true;
 	}
 }
 

@@ -50,14 +50,16 @@ protected:
 
 	void DestroyEnemy();
 
+	UFUNCTION(BlueprintCallable)
 	void DeactivateEnemy();
-
 
 	UFUNCTION(BlueprintCallable)
 	void ResetHitReact();
 
 	UFUNCTION(BlueprintCallable)
 	void ResetCanAttack();
+
+	void SetBlackboardValues();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = true))
@@ -115,6 +117,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	UParticleSystem* DeathParticles;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	TSubclassOf<AActor> HealthPickupClass;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -125,4 +130,5 @@ public:
 	FORCEINLINE bool GetIsActive() {return bIsActive;}
 	FORCEINLINE int GetManagerIndex() {return ManagerIndex;}
 	FORCEINLINE void SetManagerIndex(float NewIndex) {ManagerIndex = NewIndex;}
+	FORCEINLINE UBehaviorTree* GetBehaviorTree() {return BehaviorTree;}
 };

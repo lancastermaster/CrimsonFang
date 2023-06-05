@@ -35,6 +35,8 @@ protected:
 
 	void Attack();
 
+	void Dodge();
+
 	/** Handle touch inputs. */
 	void TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location);
 
@@ -105,6 +107,9 @@ protected:
 	bool bDying;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	bool bInvulnerable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	float DeathTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
@@ -121,6 +126,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	class UParticleSystem* SwordTrail;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	class ACheckpoint* ActiveCheckpoint;
+	
 public:
 	ACrimsonFangCharacter();
 
@@ -130,4 +138,6 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	FORCEINLINE UMainGameInstance* GetCurrentGameInstance() const {return CurrentGameInstance;}
+
+	FORCEINLINE bool GetPlayerDead() const { return bDying; }
 };

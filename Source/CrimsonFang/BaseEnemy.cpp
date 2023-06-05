@@ -8,6 +8,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "EnemyController.h"
 #include "Particles/ParticleSystem.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "GameFramework/Character.h"
+#include "CrimsonFangCharacter.h"
 
 // Sets default values
 ABaseEnemy::ABaseEnemy() :
@@ -33,6 +38,8 @@ void ABaseEnemy::BeginPlay()
 	Health = EnemyStats.MaxHealth;
 	EnemyBrain = Cast<AEnemyController>(GetController());
 	StartLocation = GetActorLocation();
+	
+	if(BehaviorTree != nullptr) EnemyBrain->RunBehaviorTree(BehaviorTree);
 }
 
 // Called every frame
@@ -40,7 +47,7 @@ void ABaseEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if(Health <=0 && bDying == false) bDying = true;
+	SetBlackboardValues();
 }
 
 float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent, AController *EventInstigator, AActor *DamageCauser)
@@ -87,8 +94,6 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent
 void ABaseEnemy::FinishDeath()
 {
 	GetMesh()->bPauseAnims = true;
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	//Deactivate the enemy's brain/behavior tree.
 
@@ -155,12 +160,15 @@ void ABaseEnemy::ReactivateEnemy()
 	bDying = false;
 	GetMesh()->bPauseAnims = false;
 	SetActorHiddenInGame(false);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	bIsActive = true;
 }
 
 void ABaseEnemy::ResetHitReact()
 {
 	bCanHitReact = true;
+	bCanAttack = true;
 }
 
 void ABaseEnemy::ResetCanAttack()
@@ -168,13 +176,48 @@ void ABaseEnemy::ResetCanAttack()
 	bCanAttack = true;
 }
 
+
 void ABaseEnemy::OnDeath_Implementation()
 {
+	this->GetMovementComponent()->StopMovementImmediately();
+	//EnemyBrain.BrainComponent->StopLogic();
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-		if(AnimInstance)
-		{
-			AnimInstance->Montage_Play(DeathMontage, 1.f);
-			AnimInstance->Montage_JumpToSection(TEXT("Death"), HitMontage);
-		}
+	if(AnimInstance)
+	{
+		AnimInstance->Montage_Play(DeathMontage, 1.f);
+		AnimInstance->Montage_JumpToSection(TEXT("Death"), HitMontage);
+	}
+
+	AActor* HealthPickup = GetWorld()->SpawnActor<AActor>(HealthPickupClass);
+	HealthPickup -> SetActorLocation(
+		this->GetActorLocation(),
+		false,
+		NULL,
+		ETeleportType::None
+	);
+
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ABaseEnemy::SetBlackboardValues()
+{
+	ACrimsonFangCharacter* Player = Cast<ACrimsonFangCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
+	bool bSeesPlayer = EnemyBrain->LineOfSightTo(Player, FVector(0.f), false);
+
+	EnemyBrain->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), bDying);
+	EnemyBrain->GetBlackboardComponent()->SetValueAsBool(FName("SeesPlayer"), bSeesPlayer);
+	EnemyBrain->GetBlackboardComponent()->SetValueAsBool(FName("PlayerDead"), Player->GetPlayerDead());
+
+	if(bSeesPlayer)
+	{
+		EnemyBrain->GetBlackboardComponent()->SetValueAsObject(FName("Player"), Player);
+	}
+	else
+	{
+		EnemyBrain->GetBlackboardComponent()->ClearValue(FName("Player"));
+	}
 }

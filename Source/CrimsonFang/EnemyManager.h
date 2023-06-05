@@ -28,8 +28,16 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TMap<int, class ABaseEnemy*> LevelEnemies;
 
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int ZombieTokens;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	int WitchTokens;*/
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	//FORCEINLINE int GetZombieTokens() {return ZombieTokens;}
+	//FORCEINLINE int GetZombieTokens() {return ZombieTokens;}
 
 };
