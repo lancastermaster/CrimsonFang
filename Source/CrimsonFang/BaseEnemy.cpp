@@ -39,6 +39,12 @@ void ABaseEnemy::BeginPlay()
 	EnemyBrain = Cast<AEnemyController>(GetController());
 	StartLocation = GetActorLocation();
 	
+	if (!bIsActive)
+	{
+		DeactivateEnemy();
+		bDying = true;
+	}
+	
 	if(BehaviorTree != nullptr) EnemyBrain->RunBehaviorTree(BehaviorTree);
 }
 
@@ -83,6 +89,8 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const &DamageEvent
 		{
 			//stun enemy
 			if(HitMontage)PlayHitMontage(FName("React"));
+
+			LaunchCharacter(GetActorForwardVector() * -1000.f,true,true);
 			//SetStunned(true);
 		}
 	}
@@ -151,11 +159,15 @@ void ABaseEnemy::DeactivateEnemy()
 {
 	SetActorHiddenInGame(true);
 	SetActorLocation(StartLocation);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	bIsActive = false;
 }
 
 void ABaseEnemy::ReactivateEnemy()
 {
+	auto MovementComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+
 	Health = EnemyStats.MaxHealth;
 	bDying = false;
 	GetMesh()->bPauseAnims = false;
@@ -163,6 +175,7 @@ void ABaseEnemy::ReactivateEnemy()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	bIsActive = true;
+	MovementComp->GravityScale = 1.f;
 }
 
 void ABaseEnemy::ResetHitReact()
@@ -179,7 +192,10 @@ void ABaseEnemy::ResetCanAttack()
 
 void ABaseEnemy::OnDeath_Implementation()
 {
-	this->GetMovementComponent()->StopMovementImmediately();
+	auto MovementComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+
+	MovementComp->StopMovementImmediately();
+	MovementComp->GravityScale = 0.f;
 	//EnemyBrain.BrainComponent->StopLogic();
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
