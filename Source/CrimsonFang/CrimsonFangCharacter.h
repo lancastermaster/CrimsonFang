@@ -78,6 +78,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ResetCanAttack();
 
+	UFUNCTION(BlueprintCallable)
+	void SetReflecting(bool NewValue);
+
 	private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = true))
 	class UMainGameInstance* CurrentGameInstance;
@@ -110,6 +113,9 @@ protected:
 	bool bInvulnerable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	bool bReflecting;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	float DeathTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
@@ -140,4 +146,6 @@ public:
 	FORCEINLINE UMainGameInstance* GetCurrentGameInstance() const {return CurrentGameInstance;}
 
 	FORCEINLINE bool GetPlayerDead() const { return bDying; }
+
+	FORCEINLINE bool GetReflecting() const { return bReflecting; }
 };

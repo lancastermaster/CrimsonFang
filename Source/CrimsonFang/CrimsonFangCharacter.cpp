@@ -261,3 +261,8 @@ void ACrimsonFangCharacter::ResetCanAttack()
 {
 	bCanAttack = true;
 }
+
+void ACrimsonFangCharacter::SetReflecting(bool NewValue)
+{
+	bReflecting = NewValue;
+}
