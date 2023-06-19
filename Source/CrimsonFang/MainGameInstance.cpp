@@ -3,3 +3,7 @@
 
 #include "MainGameInstance.h"
 
+void UMainGameInstance::SetPlayerKey(EKeyColor KeyColor, bool bNewBool)
+{
+	PlayerKeys.Add(KeyColor, bNewBool);
+}

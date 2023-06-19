@@ -11,7 +11,9 @@
 #include "IDamageableInterface.h"
 #include "MainGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Sound/SoundBase.h"
+#include "IInteractiveInterface.h"
 
 ACrimsonFangCharacter::ACrimsonFangCharacter()
 {
@@ -116,6 +118,34 @@ void ACrimsonFangCharacter::Dodge()
 {
 	LaunchCharacter(GetActorForwardVector() * 2000.f, true, true);
 }
+
+void ACrimsonFangCharacter::Interact()
+{
+	if (!bCanInteract) return;
+
+	FHitResult OutHit;
+	FVector StartLocation{ GetActorLocation() };
+	FVector EndLocation{ GetActorForwardVector() * InteractionRange };
+	
+	StartLocation.X = GetActorLocation().X + 50.f;
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		OutHit,
+		StartLocation,
+		EndLocation,
+		ECollisionChannel::ECC_WorldDynamic
+	);
+
+	if (bHit)
+	{
+		IIInteractiveInterface* InteractiveInterface = Cast<IIInteractiveInterface>(OutHit.Actor);
+
+		if (InteractiveInterface)
+		{
+			InteractiveInterface->Interact_Implementation();
+		}
+	}
+};
 
 void ACrimsonFangCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)
 {

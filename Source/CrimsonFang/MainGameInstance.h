@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "KeyColor.h"
 #include "MainGameInstance.generated.h"
 
 /**
@@ -23,8 +24,15 @@ class CRIMSONFANG_API UMainGameInstance : public UGameInstance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = true))
 	float PlayerDamage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Keys", meta = (AllowPrivateAccess = true))
+	TMap<EKeyColor, bool> PlayerKeys;
+
 	public:
 
 	FORCEINLINE float GetPlayerMaxHealth() {return PlayerMaxHealth;}
 	FORCEINLINE float GetPlayerDamage(){return PlayerDamage;}
+	FORCEINLINE TMap<EKeyColor, bool> GetPlayerKeys() { return PlayerKeys; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerKey(EKeyColor KeyColor, bool bNewBool);
 };
