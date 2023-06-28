@@ -38,6 +38,8 @@ ACrimsonFangCharacter::ACrimsonFangCharacter()
 	SideViewCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SideViewCamera"));
 	SideViewCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	SideViewCameraComponent->bUsePawnControlRotation = false; // We don't want the controller rotating the camera
+	//SideViewCameraComponent->SetProjectionMode(ECameraProjectionMode::Orthographic);
+	//SideViewCameraComponent->SetOrthoWidth(PlayerOrthoWidth);
 
 	// Create and attach the character's sword
 	SwordMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SwordMesh"));
