@@ -206,13 +206,16 @@ void ABaseEnemy::OnDeath_Implementation()
 		AnimInstance->Montage_JumpToSection(TEXT("Death"), HitMontage);
 	}
 
-	AActor* HealthPickup = GetWorld()->SpawnActor<AActor>(HealthPickupClass);
-	HealthPickup -> SetActorLocation(
-		this->GetActorLocation(),
-		false,
-		NULL,
-		ETeleportType::None
-	);
+	if (HealthPickupClass)
+	{
+		AActor* HealthPickup = GetWorld()->SpawnActor<AActor>(HealthPickupClass);
+		HealthPickup -> SetActorLocation(
+			this->GetActorLocation(),
+			false,
+			NULL,
+			ETeleportType::None
+		);
+	}
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

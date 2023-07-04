@@ -128,7 +128,40 @@ void ACrimsonFangCharacter::Attack()
 
 void ACrimsonFangCharacter::Dodge()
 {
-	LaunchCharacter(GetActorForwardVector() * 2000.f, true, true);
+	FVector DodgeVector;
+
+	DodgeVector = GetActorForwardVector() * DashDistance;
+	DodgeVector.Z = DodgeVector.Z + 200.f;
+
+	if (GhostParticles)
+	{
+
+		UGameplayStatics::SpawnEmitterAttached(
+			GhostParticles,
+			GetMesh(),
+			TEXT("Spine2"),
+			FVector(1.f),
+			FRotator(0.f),
+			EAttachLocation::SnapToTarget
+			);
+
+		/*UGameplayStatics::SpawnEmitterAtLocation(
+			this->GetWorld(),
+			GhostParticles,
+			GetMesh()->GetSocketLocation(TEXT("Spine2")),
+			FRotator(0.f),
+			FVector(1.f),
+			true
+		);*/
+	}
+
+	/*SetActorLocation(
+		DodgeVector,
+		true,
+		nullptr,
+		ETeleportType::None);*/
+
+	LaunchCharacter(DodgeVector, true, true);
 }
 
 void ACrimsonFangCharacter::Interact()
@@ -188,6 +221,7 @@ float ACrimsonFangCharacter::TakeDamage(float DamageAmount, FDamageEvent const &
 		{
 			//stun enemy
 			PlayHitMontage(FName("React"));
+			LaunchCharacter(GetActorForwardVector() * (DamageAmount * -30), true, true);
 			//SetStunned(true);
 		}
 	}
