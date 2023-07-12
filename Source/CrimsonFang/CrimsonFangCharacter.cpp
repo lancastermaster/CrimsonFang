@@ -109,16 +109,6 @@ void ACrimsonFangCharacter::MoveRight(float Value)
 {
 	// add movement in that direction
 	AddMovementInput(FVector(0.f,-1.f,0.f), Value);
-
-	/*if (Value > 0)
-	{
-		CameraBoom->SocketOffset = FVector(0.f, 100.f, 75.f);
-	}
-
-	if (Value < 0)
-	{
-		CameraBoom->SocketOffset = FVector(0.f, -100.f, 75.f);
-	}*/
 }
 
 void ACrimsonFangCharacter::Attack()

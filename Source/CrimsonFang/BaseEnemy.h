@@ -94,9 +94,10 @@ private:
 
 	FTimerHandle DeathTimer;
 
-	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, Category = "AI", meta = (AllowPrivateAccess = true))
 	class UBehaviorTree* BehaviorTree;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = true))
 	class AEnemyController* EnemyBrain;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
