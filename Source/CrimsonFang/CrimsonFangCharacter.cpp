@@ -113,7 +113,10 @@ void ACrimsonFangCharacter::MoveRight(float Value)
 
 void ACrimsonFangCharacter::Attack()
 {
-	if(bCanAttack)PlayAttackMontage("Slash");
+	if (bCanAttack)
+	{
+		PlayAttackMontage(AttackMontageSections[ComboCounter]);
+	}
 }
 
 void ACrimsonFangCharacter::Dodge()
@@ -131,18 +134,9 @@ void ACrimsonFangCharacter::Dodge()
 			GetMesh(),
 			TEXT("Spine2"),
 			FVector(1.f),
-			FRotator(0.f),
+			GetActorForwardVector().Rotation(),
 			EAttachLocation::SnapToTarget
 			);
-
-		/*UGameplayStatics::SpawnEmitterAtLocation(
-			this->GetWorld(),
-			GhostParticles,
-			GetMesh()->GetSocketLocation(TEXT("Spine2")),
-			FRotator(0.f),
-			FVector(1.f),
-			true
-		);*/
 	}
 
 	/*SetActorLocation(
@@ -150,6 +144,8 @@ void ACrimsonFangCharacter::Dodge()
 		true,
 		nullptr,
 		ETeleportType::None);*/
+
+	//TeleportTo(DodgeVector, GetActorRotation());
 
 	LaunchCharacter(DodgeVector, true, true);
 }
