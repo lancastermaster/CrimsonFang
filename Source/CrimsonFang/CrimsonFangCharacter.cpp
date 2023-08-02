@@ -72,6 +72,10 @@ void ACrimsonFangCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	CurrentGameInstance = Cast<UMainGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	CurrentGameInstance->LoadPlayerInfo();
+
+	CurrentGameInstance->SetLevelName(GetWorld()->GetMapName());
+	CurrentGameInstance->SavePlayerInfo();
 
 	Health = CurrentGameInstance->GetPlayerMaxHealth();
 
@@ -147,7 +151,14 @@ void ACrimsonFangCharacter::Dodge()
 
 	//TeleportTo(DodgeVector, GetActorRotation());
 
-	LaunchCharacter(DodgeVector, true, true);
+	//LaunchCharacter(DodgeVector, true, true);
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(DodgeMontage, 1.f);
+	}
 }
 
 void ACrimsonFangCharacter::Interact()

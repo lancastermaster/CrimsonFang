@@ -83,7 +83,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SetReflecting(bool NewValue);
 
-	private:
+private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = true))
 	class UMainGameInstance* CurrentGameInstance;
 
@@ -92,6 +92,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
+	UAnimMontage* DodgeMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = true))
 	UAnimMontage* HitMontage;
