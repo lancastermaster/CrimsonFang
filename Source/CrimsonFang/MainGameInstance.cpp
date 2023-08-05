@@ -36,7 +36,7 @@ void UMainGameInstance::SavePlayerInfo()
 	//if (bSaveExists)
 	//{
 
-
+	FillSaveInfo();
 		CurrentSaveGame->SetSaveInfo(PlayerSaveInfo);
 		UGameplayStatics::AsyncSaveGameToSlot(CurrentSaveGame, SaveSlotName, 0);
 		//UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlotName, 0);

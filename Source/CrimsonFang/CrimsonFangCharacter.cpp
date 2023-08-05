@@ -74,7 +74,8 @@ void ACrimsonFangCharacter::BeginPlay()
 	CurrentGameInstance = Cast<UMainGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	CurrentGameInstance->LoadPlayerInfo();
 
-	CurrentGameInstance->SetLevelName(GetWorld()->GetMapName());
+	CurrentGameInstance->SetLevelName(UGameplayStatics::GetCurrentLevelName(this));
+	
 	CurrentGameInstance->SavePlayerInfo();
 
 	Health = CurrentGameInstance->GetPlayerMaxHealth();
@@ -111,6 +112,10 @@ void ACrimsonFangCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 void ACrimsonFangCharacter::MoveRight(float Value)
 {
+	if (Value < 0) SetActorRotation(FRotator(0.f, 90.f, 0.f));
+	
+	if (Value > 0) SetActorRotation(FRotator(0.f, -90.f, 0.f));
+
 	// add movement in that direction
 	AddMovementInput(FVector(0.f,-1.f,0.f), Value);
 }
